@@ -54,7 +54,7 @@ def check_tokens():
 
 
 def send_message(bot, message):
-    """Sends a message to bot"""
+    """Sends a message to bot."""
     try:
         bot.send_message(
             chat_id=TELEGRAM_CHAT_ID,
@@ -66,7 +66,7 @@ def send_message(bot, message):
 
 
 def get_api_answer(timestamp):
-    """Gets a response from Yandex's homework API in JSON"""
+    """Gets a response from Yandex's homework API in JSON."""
     try:
         payload = {'from_date': timestamp}
         json_response = get(ENDPOINT, headers=HEADERS, params=payload).json()
@@ -76,7 +76,7 @@ def get_api_answer(timestamp):
 
 
 def check_response(response):
-    """Checks resposne from get_api_answer function"""
+    """Checks resposne from get_api_answer function."""
     if response.get('homeworks') is None:
         error = KeyError(
             'Something wrong with "homeworks" key in API response!'
@@ -90,14 +90,14 @@ def check_response(response):
 
 
 def parse_status(homework):
-    """Returns homeworks's name and verdict"""
+    """Returns homeworks's name and verdict."""
     homework_name = homework[0].get('homework_name')
     verdict = HOMEWORK_VERDICTS[homework[0].get('status')]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
 def main():
-    """Main logic of the bot"""
+    """Main logic of the bot."""
     bot = Bot(token=TELEGRAM_TOKEN)
     updater = Updater(token=TELEGRAM_TOKEN)
     timestamp = int(time())
