@@ -1,14 +1,14 @@
-from time import time
+import logging
 from os import getenv
-from requests import get
+from sys import stdout
+from time import time
+
 from dotenv import load_dotenv
+from requests import get
 from telegram import Bot
 from telegram.ext import Updater
-from sys import stdout
 
-import logging
-
-from .exceptions import TokenError, ChatIdError
+from .exceptions import ChatIdError, TokenError
 
 load_dotenv()
 
