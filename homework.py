@@ -8,7 +8,7 @@ from requests import get
 from telegram import Bot
 from telegram.ext import Updater
 
-from .exceptions import ChatIdError, TokenError
+from exceptions import ChatIdError, TokenError
 
 load_dotenv()
 
