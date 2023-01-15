@@ -62,31 +62,35 @@ def send_message(bot, message):
             chat_id=TELEGRAM_CHAT_ID,
             text=message,
         )
-        logging.debug('''Yay! Everything compiled seamlessly
+        logger.debug('''Yay! Everything compiled seamlessly
          (or no) but the message was sent''')
+        return message
     except Exception as error:
         logger.error(msg=error)
+        return error
 
 
 def get_api_answer(timestamp):
     """Gets a response from Yandex's homework API in JSON."""
+    payload = {'from_date': timestamp}
     try:
-        payload = {'from_date': timestamp}
         response = requests.get(ENDPOINT, headers=HEADERS, params=payload)
-        if response.status_code != HTTPStatus.OK:
-            logger.error(msg='Response did not return 200')
-            raise ResponseError(__doc__)
-        return response.json()
     except Exception as error:
         logger.error(msg=error)
-        raise ResponseError(__doc__)
+        raise ResponseError(error)
+
+    if response.status_code != HTTPStatus.OK:
+        error = 'Response did not return 200'
+        logger.error(msg=error)
+        raise ResponseError(error)
+    return response.json()
 
 
 def check_response(response):
     """Checks resposne from get_api_answer function."""
-    if type(response) == list:
+    if isinstance(response, list):
         raise TypeError('response is a list, expected dict')
-    if type(response.get('homeworks')) != list:
+    if not isinstance(response.get('homeworks'), list):
         raise TypeError('`homeworks` key is not a list, expected list')
     if response.get('homeworks') is None:
         error = KeyError(
@@ -103,20 +107,19 @@ def check_response(response):
 
 def parse_status(homework):
     """Returns homeworks's name and verdict."""
-    try:
-        homework_name = homework.get('homework_name')
-        status = homework.get('status')
-        if homework_name is None:
-            raise HomeworkError(__doc__)
-        if status is None:
-            raise HomeworkError(__doc__)
-        if status not in HOMEWORK_VERDICTS:
-            raise KeyError('No such status in HOMEWORK_VERDICTS')
-        verdict = HOMEWORK_VERDICTS.get(status)
-        return f'Изменился статус проверки работы "{homework_name}". {verdict}'
-    except Exception as error:
-        logger.error(msg=error)
-        raise HomeworkError(__doc__)
+    homework_name = homework.get('homework_name')
+    if homework_name is None:
+        raise HomeworkError('`homework` is None')
+
+    status = homework.get('status')
+    if status is None:
+        raise HomeworkError('`Status` is None')
+
+    if status not in HOMEWORK_VERDICTS:
+        raise KeyError('No such status in HOMEWORK_VERDICTS')
+
+    verdict = HOMEWORK_VERDICTS.get(status)
+    return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
 def main():
@@ -138,8 +141,7 @@ def main():
             message = f'Сбой в работе программы: {error}'
             logger.error(msg=error)
         if last_message != message:
-            send_message(bot, message)
-        last_message = message
+            last_message = send_message(bot, message)
         time.sleep(RETRY_PERIOD)
 
 
