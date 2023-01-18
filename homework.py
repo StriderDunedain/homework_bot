@@ -88,8 +88,8 @@ def get_api_answer(timestamp):
 
 def check_response(response):
     """Checks resposne from get_api_answer function."""
-    if isinstance(response, list):
-        raise TypeError('response is a list, expected dict')
+    if not isinstance(response, dict):
+        raise TypeError('Response is not dict')
     if not isinstance(response.get('homeworks'), list):
         raise TypeError('`homeworks` key is not a list, expected list')
     if response.get('homeworks') is None:
